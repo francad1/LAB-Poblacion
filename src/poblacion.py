@@ -15,16 +15,20 @@ RegistroPoblacion = namedtuple("RegistroPoblacion", "pais, codigo, año, censo")
 
 ############################################################################################
 def lee_poblaciones(ruta_fichero):
-    """
-    Lee el fichero de entrada y devuelve una lista de tuplas poblaciones
+    
+    with ruta_fichero as archivo:
 
-    @param fichero: nombre del fichero de entrada
-    @type fichero: str
+        reader=csv.reader(archivo)
+        registros=[]
+        for line in reader:
+            pais=str(line[0])
+            codigo = str(line[1])
+            año = int(line[2])
+            censo= int(line[3])
+            registro= RegistroPoblacion(pais,codigo,año,censo)
+            registros.append(registro)
 
-    @return: lista de tuplas con la información del fichero
-    @rtype: RegistroPoblacion
-    """
-    pass
+        return registros
 
 
 def calcula_paises(poblaciones):
@@ -36,8 +40,15 @@ def calcula_paises(poblaciones):
 
     @return: lista de paises, ordenada alfabéticamente, sin duplicados
     @rtype: list(str)
+
     """
-    pass
+    paises=[]
+    for e in poblaciones:
+        paises.append(e[0])
+    pais_sin_duplicados= list(set(paises))
+    pais_sin_duplicados.sort()
+
+    return pais_sin_duplicados
 
 
 def filtra_por_pais(poblaciones, pais_o_codigo):
@@ -52,6 +63,13 @@ def filtra_por_pais(poblaciones, pais_o_codigo):
     @return: lista de tuplas (año, censo) seleccionadas
     @rtype: list(tuple(int, int))
     """
+    filtrado_por_pais=[]
+    for e in poblaciones:
+        if e[0]==pais_o_codigo or e[1]==pais_o_codigo:
+            filtrado_por_pais.append(e)
+    return filtrado_por_pais
+
+
     pass
 
 
@@ -72,6 +90,16 @@ def filtra_por_paises_y_anyo(poblaciones, año, paises):
     @return: lista de tuplas (pais, censo) seleccionadas
     @rtype: list(tuple(str,int))
     """
+    pais_anyo=[]
+    for e in poblaciones:
+        if e[2]==año:
+            for i in list(paises):
+                if e[0] == i:
+                    tupla=(e[0],e[3])
+                    pais_anyo.append(tupla) 
+    return pais_anyo
+
+
     pass
 
 
@@ -90,9 +118,14 @@ def muestra_evolucion_poblacion(poblaciones, pais_o_codigo):
     """
     # TODO Complete la función para asignar los valores correctos
     #  a las variables titulo, lista_años y lista_habitantes
-    titulo = ""
+    titulo = "Evolución de " + pais_o_codigo
     lista_años = []
     lista_habitantes = []
+
+    for e in poblaciones:
+        if e[0] == pais_o_codigo or e[1]==pais_o_codigo:
+            lista_años.append(e[2])
+            lista_habitantes.append(e[3])
 
     # Estas instrucciones dibujan la gráfica
     plt.title(titulo)
@@ -117,9 +150,16 @@ def muestra_comparativa_paises_anyo(poblaciones, año, paises):
     """
     # TODO Complete la función para asignar los valores correctos
     #  a las variables titulo, lista_paises y lista_habitantes
-    titulo = ""
+    titulo = "Evolucion" + str(paises)
     lista_paises = []
     lista_habitantes = []
+
+    pais_poblacion= filtra_por_paises_y_anyo(poblaciones, año, paises)
+
+    pais_poblacion.sort(key=lambda pais_censo: pais_censo[0])
+    for e in pais_poblacion:
+        lista_paises.append(e[0])
+        lista_habitantes.append(e[1])
 
     # Estas instrucciones dibujan la gráfica
     plt.title(titulo)
